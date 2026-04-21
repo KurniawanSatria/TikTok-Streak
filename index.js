@@ -11,6 +11,7 @@ const isDebug = args.includes('--debug')
 
 const CREDENTIALS_FILE = path.join(__dirname, 'cookies.json')
 const BROWSER_CONFIG = {
+  executablePath: '/usr/bin/chromium-browser',
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
   headless: true,
 }
