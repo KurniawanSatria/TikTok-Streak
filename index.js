@@ -117,7 +117,7 @@ const main = async () => {
         if (isDebug) console.log(magenta(`  [~] Mengetik pesan...`))
         await editor.click()
         await new Promise(r => setTimeout(r, 500))
-        await page.keyboard.type(new Date().toLocaleString(), { delay: 50 })
+        await page.keyboard.type(`[AUTO STREAK] ${new Date().toLocaleString()}`, { delay: 50 })
         await new Promise(r => setTimeout(r, 1000))
 
         // ==================== FIND & CLICK SEND BUTTON ====================
