@@ -1,19 +1,6 @@
-# TikTok Streak - Automated DM Bot
+# TikTok Streak
 
-Bot otomatis untuk mengirim pesan ke 16 user pertama di TikTok Business Suite Messages.
-
-## 🚀 Fitur
-
-- ✅ Auto-send pesan ke 16 user pertama
-- ✅ Support multiple session files (cookies.json & tiktok-session.json)
-- ✅ Configurable delay & loop count
-- ✅ Debug mode untuk troubleshooting
-- ✅ Auto-close passkey popup
-- ✅ Auto-close iframe popup
-- ✅ Customizable message & selectors
-- ✅ Colorful logging dengan Kleur
-
-## 📋 Prasyarat
+## 📋 Syarat
 
 - Node.js v16+
 - Puppeteer
