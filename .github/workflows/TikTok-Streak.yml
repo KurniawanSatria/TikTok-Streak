@@ -3,7 +3,7 @@ name: Run Node Cron
 on:
   schedule:
     - cron: '0 15 * * *'
-    - cron: '0 18 * * *'
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 jobs:
