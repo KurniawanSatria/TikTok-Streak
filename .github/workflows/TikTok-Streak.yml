@@ -29,4 +29,4 @@ jobs:
           EOF
 
       - name: Run script
-        run: node index.js
+        run: npm install && node index.js
