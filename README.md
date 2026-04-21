@@ -68,7 +68,43 @@ module.exports = {
 
 ## 📝 Cara Menggunakan
 
-### 1. Siapkan Session File
+### 1. Mendapatkan Cookies
+
+#### Metode 1: Ekstensi Browser (Paling Mudah)
+
+Install ekstensi **Cookie-Editor** atau **EditThisCookie** di Chrome/Edge:
+
+1. Buka [Cookie-Editor](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicfdnnnalkblc) di Chrome Web Store
+2. Buka TikTok dan login
+3. Klik icon ekstensi di toolbar
+4. Cari cookie dengan nama `sessionid` atau cookie TikTok lainnya
+5. Export semua cookie TikTok dalam format JSON
+
+#### Metode 2: DevTools Manual
+
+1. Buka TikTok di browser
+2. Tekan `F12` atau `Ctrl+Shift+I` untuk membuka DevTools
+3. Pergi ke tab **Application** (Chrome) atau **Storage** (Edge)
+4. Klik **Cookies** di sidebar kiri
+5. Pilih `https://www.tiktok.com`
+6. Copy semua cookie dan ubah ke format JSON
+
+#### Metode 3: Script DevTools
+
+Buka DevTools (F12) dan jalankan script ini:
+
+```javascript
+// Copy cookies ke clipboard
+copy(document.cookie.split(';').map(c => c.trim()).reduce((acc, curr) => {
+  const [name, value] = curr.split('=');
+  acc.push({ name, value, domain: '.tiktok.com', path: '/' });
+  return acc;
+}, []));
+```
+
+Lalu paste hasilnya ke file `cookies.json`.
+
+### 2. Siapkan Session File
 
 Buat file `cookies.json` atau `tiktok-session.json` dengan format:
 
@@ -78,10 +114,15 @@ Buat file `cookies.json` atau `tiktok-session.json` dengan format:
     "name": "sessionid",
     "value": "your_session_id",
     "domain": ".tiktok.com",
-    "path": "/"
+    "path": "/",
+    "expires": -1,
+    "httpOnly": true,
+    "secure": true
   }
 ]
 ```
+
+**⚠️ Penting:** Pastikan cookie masih valid (belum expired). Cookie TikTok biasanya berlaku 90 hari.
 
 ### 2. Jalankan Bot
 
