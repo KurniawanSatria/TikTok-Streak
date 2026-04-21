@@ -1,6 +1,6 @@
 module.exports = {
   // ==================== BROWSER CONFIG ====================
-  headless: true,          // true = browser tidak terlihat, false = browser terbuka
+  headless: false,          // true = browser tidak terlihat, false = browser terbuka
   viewportWidth: 1280,      // Lebar browser
   viewportHeight: 800,      // Tinggi browser
   
@@ -14,7 +14,7 @@ module.exports = {
   typeDelay: 50,            // Delay saat mengetik pesan (ms)
   
   // ==================== MESSAGE CONFIG ====================
-  message: 'API',           // Pesan yang akan dikirim
+  message: 'API API APA YANG PEPEK API PEPEK',           // Pesan yang akan dikirim
   includeTimestamp: false,  // Tambahkan timestamp di awal pesan?
   
   // ==================== FILE PATH ====================
