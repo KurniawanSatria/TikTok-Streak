@@ -1,0 +1,26 @@
+{
+  "name": "automation",
+  "version": "1.0.0",
+  "description": "- Node.js v16+\r - Puppeteer\r - Kleur",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KurniawanSatria/TikTok-Streak.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KurniawanSatria/TikTok-Streak/issues"
+  },
+  "homepage": "https://github.com/KurniawanSatria/TikTok-Streak#readme",
+  "dependencies": {
+    "figlet": "^1.11.0",
+    "fs": "^0.0.1-security",
+    "kleur": "^4.1.5",
+    "puppeteer": "^24.42.0"
+  }
+}
