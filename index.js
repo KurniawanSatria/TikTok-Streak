@@ -12,7 +12,7 @@ const isDebug = args.includes('--debug')
 const CREDENTIALS_FILE = path.join(__dirname, 'cookies.json')
 const BROWSER_CONFIG = {
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  headless: false,
+  headless: true,
 }
 
 
