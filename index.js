@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core')
+const puppeteer = require('puppeteer')
 const fs = require('fs')
 const path = require('path')
 const config = require('./config.js')
@@ -11,11 +11,9 @@ const isDebug = args.includes('--debug')
 
 const CREDENTIALS_FILE = path.join(__dirname, 'cookies.json')
 const BROWSER_CONFIG = {
-  executablePath: '/usr/bin/chromium-browser',
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  headless: true,
+  headless: false,
 }
-
 
 const main = async () => {
   const banner = figlet.textSync('TikTok Streak', {
@@ -44,11 +42,16 @@ const main = async () => {
     browser = await puppeteer.launch(BROWSER_CONFIG)
     const page = await browser.newPage()
     await page.setViewport({ width: 1280, height: 800 })
+
+    // ==================== GRANT CLIPBOARD PERMISSION ====================
+    const context = browser.defaultBrowserContext()
+    await context.overridePermissions('https://www.tiktok.com', ['clipboard-read', 'clipboard-write'])
+
     await page.setCookie(...credentials.cookies)
 
     // ==================== NAVIGATE TO MESSAGES ====================
     if (isDebug) console.log(yellow('[+] Membuka halaman TikTok messages...'))
-    await page.goto('https://www.tiktok.com/business-suite/messages?from=homepage&lang=en', {
+    await page.goto('https://www.tiktok.com/messages?lang=en', {
       waitUntil: 'networkidle2',
       timeout: 60000
     })
@@ -72,11 +75,7 @@ const main = async () => {
           // Ignore jika popup tidak ada
         }
 
-        // ==================== CARI FRAME ====================
-        await page.waitForFunction(() => document.querySelector('iframe[data-testid*="message-index"]'), { timeout: 15000 })
-        const iframeHandle = await page.$('iframe[data-testid*="message-index"]')
-        const frame = await iframeHandle.contentFrame()
-        if (!frame) throw new Error('contentFrame returned null')
+        const frame = page
 
         // ==================== CLOSE POPUP DI FRAME (JIKA ADA) ====================
         try {
@@ -90,7 +89,7 @@ const main = async () => {
               }
             }
           })
-          await new Promise(r => setTimeout(r, 1000))
+          await new Promise(r => setTimeout(r, 100))
         } catch (e) {
           // Popup tidak ada, lanjut
         }
@@ -107,47 +106,50 @@ const main = async () => {
 
         console.log(yellow(`\n[${i + 1}/16] Mengirim pesan ke: ${username}`))
 
-        await new Promise(r => setTimeout(r, 2000))
+        await new Promise(r => setTimeout(r, 500))
 
         // ==================== CARI EDITOR DI FRAME ====================
         if (isDebug) console.log(yellow('  [~] Mencari editor...'))
-        await frame.waitForSelector('div.notranslate.public-DraftEditor-content', { timeout: 10000 })
+        await frame.waitForSelector('div.notranslate.public-DraftEditor-content', { timeout: 3000 })
         const editor = await frame.$('div.notranslate.public-DraftEditor-content')
         if (!editor) throw new Error('Editor not found')
 
-        // ==================== TYPE MESSAGE ====================
-        if (isDebug) console.log(magenta(`  [~] Mengetik pesan...`))
+        // ==================== SET CLIPBOARD & PASTE ====================
+        if (isDebug) console.log(magenta('  [~] Set clipboard & paste pesan...'))
+        const message = `🔥🔥🔥`
+
         await editor.click()
+        await new Promise(r => setTimeout(r, 300))
+
+        let pasted = false
+        try {
+          // Coba via clipboard API (lebih cepat)
+          await page.evaluate(async (msg) => {
+            await navigator.clipboard.writeText(msg)
+          }, message)
+          await new Promise(r => setTimeout(r, 200)) // tunggu clipboard keisi
+
+          await page.keyboard.down('Control')
+          await page.keyboard.press('v')
+          await page.keyboard.up('Control')
+          await new Promise(r => setTimeout(r, 300))
+          pasted = true
+        } catch (e) {
+          if (isDebug) console.log(yellow('  [~] Clipboard gagal, fallback ke type...'))
+        }
+
+        // Fallback: type dengan delay 0 (tetap cepat)
+        if (!pasted) {
+          await page.keyboard.type(message, { delay: 0 })
+          await new Promise(r => setTimeout(r, 500))
+        }
+
+        // ==================== SEND DENGAN CTRL+ENTER ====================
+        if (isDebug) console.log(blue('  [~] Mengirim dengan Ctrl+Enter...'))
+        await page.keyboard.down('Control')
+        await page.keyboard.press('Enter')
+        await page.keyboard.up('Control')
         await new Promise(r => setTimeout(r, 500))
-        await page.keyboard.type(`[AUTO STREAK] ${new Date().toLocaleString()}`, { delay: 50 })
-        await new Promise(r => setTimeout(r, 1000))
-
-        // ==================== FIND & CLICK SEND BUTTON ====================
-        if (isDebug) console.log(blue(`  [~] Mencari tombol send...`))
-        const sendSelectors = [
-          'div[role="button"][aria-label*="send" i]',
-          'button[aria-label*="send" i]',
-          'div[data-e2e*="send"]',
-          '[data-e2e*="send"]',
-        ]
-
-        let sent = false
-        for (const selector of sendSelectors) {
-          const btn = await frame.$(selector)
-          if (btn) {
-            if (isDebug) console.log(yellow(`  [~] Mengirim...`))
-            await btn.click()
-            await new Promise(r => setTimeout(r, 1000))
-            sent = true
-            break
-          }
-        }
-
-        if (!sent) {
-          if (isDebug) console.log(magenta(`  [~] Menggunakan Enter...`))
-          await page.keyboard.press('Enter')
-          await new Promise(r => setTimeout(r, 1000))
-        }
 
         console.log(green(`  [✓] Terkirim!`))
         success++
@@ -160,7 +162,7 @@ const main = async () => {
       // ==================== DELAY SEBELUM USER BERIKUTNYA ====================
       if (i < 15) {
         if (isDebug) console.log(yellow(`  [~] Tunggu ${config.delay}ms...`))
-        await new Promise(r => setTimeout(r, config.delay))
+        await new Promise(r => setTimeout(r, 300))
       }
     }
 
