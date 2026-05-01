@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
 const path = require('path')
-const config = require('./config.js')
+//const config = require('./config.js')
 const figlet = require('figlet')
 const { bold, red, bgCyan, yellow, blue, magenta, cyan, green, white } = require('kleur/colors')
 
@@ -25,10 +25,7 @@ const main = async () => {
   console.clear()
   console.log(bold(cyan(banner)))
   console.log(yellow('\n[+] Made with 🚬 and ☕ by Saturia.'))
-  console.log(blue('[+] Message:', config.message))
-  console.log(magenta('[+] Delay:', config.delay, 'ms\n'))
-  console.log(yellow(`[+] Mode: ${isDebug ? 'Debug' : 'Normal'}\n`))
-
+  console.log(blue('[+] Message:', '👍'))
   // ==================== LOAD CREDENTIALS ====================
   if (!fs.existsSync(CREDENTIALS_FILE)) throw new Error('Session file not found')
   let credentials
