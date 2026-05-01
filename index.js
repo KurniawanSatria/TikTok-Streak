@@ -107,7 +107,7 @@ const main = async () => {
 
         // ==================== CARI EDITOR DI FRAME ====================
         if (isDebug) console.log(yellow('  [~] Mencari editor...'))
-        await frame.waitForSelector('div.notranslate.public-DraftEditor-content', { timeout: 3000 })
+        await frame.waitForSelector('div.notranslate.public-DraftEditor-content', { timeout: 5000 })
         const editor = await frame.$('div.notranslate.public-DraftEditor-content')
         if (!editor) throw new Error('Editor not found')
 
@@ -116,7 +116,7 @@ const main = async () => {
         const message = `👍`
 
         await editor.click()
-        await new Promise(r => setTimeout(r, 300))
+        await new Promise(r => setTimeout(r, 500))
 
         let pasted = false
         try {
@@ -124,12 +124,12 @@ const main = async () => {
           await page.evaluate(async (msg) => {
             await navigator.clipboard.writeText(msg)
           }, message)
-          await new Promise(r => setTimeout(r, 200)) // tunggu clipboard keisi
+          await new Promise(r => setTimeout(r, 500)) // tunggu clipboard keisi
 
           await page.keyboard.down('Control')
           await page.keyboard.press('v')
           await page.keyboard.up('Control')
-          await new Promise(r => setTimeout(r, 300))
+          await new Promise(r => setTimeout(r, 500))
           pasted = true
         } catch (e) {
           if (isDebug) console.log(yellow('  [~] Clipboard gagal, fallback ke type...'))
@@ -146,7 +146,7 @@ const main = async () => {
         await page.keyboard.down('Control')
         await page.keyboard.press('Enter')
         await page.keyboard.up('Control')
-        await new Promise(r => setTimeout(r, 500))
+        await new Promise(r => setTimeout(r, 1000))
 
         console.log(green(`  [✓] Terkirim!`))
         success++
@@ -158,8 +158,8 @@ const main = async () => {
 
       // ==================== DELAY SEBELUM USER BERIKUTNYA ====================
       if (i < 15) {
-        if (isDebug) console.log(yellow(`  [~] Tunggu ${config.delay}ms...`))
-        await new Promise(r => setTimeout(r, 300))
+        if (isDebug) console.log(yellow(`  [~] Tunggu ${1500}ms...`))
+        await new Promise(r => setTimeout(r, 1500))
       }
     }
 
