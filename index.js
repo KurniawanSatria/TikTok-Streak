@@ -26,8 +26,8 @@ verticalLayout: 'default'
 console.clear()
 console.log(bold(cyan(banner)))
 console.log(yellow('\n[+] Made with 🚬 and ☕ by Saturia.'))
-console.log(blue('[+] Message:', config.message))
-console.log(magenta('[+] Delay:', config.delay, 'ms\n'))
+console.log(blue('[+] Message:','auto'))
+console.log(magenta('[+] Delay:', '300 ms\n'))
 console.log(yellow(`[+] Mode: ${isDebug ? 'Debug' : 'Normal'}\n`))
 
 // ==================== LOAD CREDENTIALS ====================
@@ -152,7 +152,7 @@ failed++
 
 // ==================== DELAY SEBELUM USER BERIKUTNYA ====================
 if (i < 15) {
-if (isDebug) console.log(yellow(`  [~] Tunggu ${config.delay}ms...`))
+if (isDebug) console.log(yellow(`  [~] Tunggu 300 ms...`))
 await new Promise(r => setTimeout(r, 300))
 }
 }
