@@ -25,7 +25,7 @@ jobs:
         run: ls -R
 
       - name: Run script
-        run: npm install && node index.js
+        run: npm install && node index.js --debug
 
       - name: Commit and push updated cookies
         run: |
