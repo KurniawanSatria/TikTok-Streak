@@ -62,7 +62,7 @@ await new Promise(r => setTimeout(r, 5000))
 let success = 0, failed = 0
 
 // ==================== LOOP THROUGH 16 USERS ====================
-for (let i = 0; i < 9; i++) {
+for (let i = 0; i < 14; i++) {
 try {
 
 const frame = page
