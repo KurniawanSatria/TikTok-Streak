@@ -62,7 +62,7 @@ await new Promise(r => setTimeout(r, 5000))
 let success = 0, failed = 0
 
 // ==================== LOOP THROUGH 16 USERS ====================
-for (let i = 0; i < 9; i++) {
+for (let i = 0; i < 15; i++) {
 try {
 
 const frame = page
@@ -107,7 +107,7 @@ if (!editor) throw new Error('Editor not found')
 
 // ==================== SET CLIPBOARD & PASTE ====================
 if (isDebug) console.log(magenta('  [~] Set clipboard & paste pesan...'))
-const message = `👍`
+const message = `[ BOT ] Setitit, eh Streak 👍`
 
 await editor.click()
 await new Promise(r => setTimeout(r, 300))
