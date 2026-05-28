@@ -107,7 +107,7 @@ if (!editor) throw new Error('Editor not found')
 
 // ==================== SET CLIPBOARD & PASTE ====================
 if (isDebug) console.log(magenta('  [~] Set clipboard & paste pesan...'))
-const message = `[ BOT ] 👍`
+const message = `👍`
 
 await editor.click()
 await new Promise(r => setTimeout(r, 300))
