@@ -22,7 +22,7 @@ const CREDENTIALS_FILE = path.join(__dirname, "cookies.json");
 const CONFIG_FILE = path.join(__dirname, "config.json");
 
 const DEFAULT_CONFIG = {
-  message: "Auto Streak",
+  message: "API",
   totalUsers: 13,
   actionDelayMs: 300,
   typeDelayMs: 0,
