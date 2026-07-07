@@ -77,14 +77,27 @@ const main = async () => {
   console.log(blue("[+] Message:", CONFIG.message));
   console.log(magenta("[+] Delay:", `${CONFIG.actionDelayMs} ms\n`));
   console.log(yellow(`[+] Mode: ${isDebug ? "Debug" : "Normal"}\n`));
-  if (!fs.existsSync(CREDENTIALS_FILE))
-    throw new Error("Session file not found");
   let credentials;
-  try {
-    const data = JSON.parse(fs.readFileSync(CREDENTIALS_FILE, "utf8"));
-    credentials = Array.isArray(data) ? { cookies: data } : { cookies: [data] };
-  } catch {
-    throw new Error("Invalid session file");
+  if (process.env.COOKIES_JSON) {
+    try {
+      const data = JSON.parse(process.env.COOKIES_JSON);
+      credentials = Array.isArray(data) ? { cookies: data } : { cookies: [data] };
+      console.log(green("[+] Cookies loaded from COOKIES_JSON env var"));
+    } catch {
+      throw new Error("Invalid COOKIES_JSON environment variable");
+    }
+  } else if (fs.existsSync(CREDENTIALS_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(CREDENTIALS_FILE, "utf8"));
+      credentials = Array.isArray(data) ? { cookies: data } : { cookies: [data] };
+      console.log(yellow("[+] Cookies loaded from cookies.json (local only)"));
+    } catch {
+      throw new Error("Invalid session file");
+    }
+  } else {
+    throw new Error(
+      "Session not found. Set COOKIES_JSON env var or create cookies.json",
+    );
   }
   let browser;
   try {

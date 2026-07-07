@@ -13,38 +13,35 @@ Script otomatisasi untuk mengirim pesan streak ke daftar percakapan TikTok mengg
 ## Instalasi
 
 ```bash
-npm install puppeteer figlet moment-timezone kleur dotenv
+npm install puppeteer figlet moment-timezone kleur
 ```
 
 ## Setup Cookies
 
-Ada dua cara, pilih salah satu:
+### GitHub Secrets (Public Repo)
 
-### 1. Pakai file `cookies.json`
+Karena repo ini public, cookies **jangan** disimpan di file. Gunakan GitHub Secrets:
 
-Buat file `cookies.json` di folder yang sama, isinya array cookies dari browser:
+1. Export cookies dari browser (EditThisCookie / cookie-export)
+2. Copy JSON array cookies ke clipboard
+3. Di GitHub repo, masuk ke **Settings → Secrets and variables → Actions**
+4. Tambah secret baru: nama `COOKIES_JSON`, isi dengan JSON cookies
 
-```json
-[
-  {
-    "name": "sessionid",
-    "value": "xxx",
-    "domain": ".tiktok.com"
-  }
-]
-```
+Script otomatis baca dari `process.env.COOKIES_JSON`.
 
-### 2. Pakai Environment Variable (lebih aman buat deploy)
+### Local Development
 
-Set env var `COOKIES_JSON` dengan isi JSON yang sama (satu baris):
+Buat file `.env` di root (jangan di-commit, sudah di `.gitignore`):
 
-```
+```env
 COOKIES_JSON=[{"name":"sessionid","value":"xxx","domain":".tiktok.com"}]
 ```
 
-Bisa lewat file `.env` (untuk local dev) atau langsung di environment hosting (Pterodactyl, Azure, dll).
+Atau buat `cookies.json` untuk fallback lokal (jangan di-commit).
 
-Jika `COOKIES_JSON` ada, dia akan dipakai duluan. Kalau tidak ada, otomatis fallback ke `cookies.json`.
+Urutan prioritas loading:
+1. `COOKIES_JSON` env var (prioritas utama — GitHub Actions / hosting)
+2. `cookies.json` file (fallback lokal, sudah di `.gitignore`)
 
 ## Konfigurasi
 
