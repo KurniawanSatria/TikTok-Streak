@@ -1,51 +1,39 @@
 # TikTok Streak Bot
 
-Script otomatisasi untuk mengirim pesan streak ke daftar percakapan TikTok menggunakan Puppeteer.
+Otomatis kirim pesan streak ke percakapan TikTok via **GitHub Actions** — jalan di cloud, ga perlu PC nyala.
 
 ## Fitur
 
-- Login pakai cookies (session) TikTok, tanpa perlu login manual
-- Kirim pesan otomatis ke banyak chat sekaligus
-- Konfigurasi fleksibel via `config.json` atau CLI args
-- Cookies bisa dari file atau environment variable (cocok buat deploy/hosting)
-- Mode debug untuk lihat detail proses
+- Login pakai cookies session TikTok
+- Kirim pesan otomatis ke banyak chat
+- Konfigurasi via `config.json`
+- Jalan otomatis sesuai cron schedule
+- Bisa di-trigger manual kapan aja
 
-## Instalasi
+## Setup
 
-```bash
-npm install puppeteer figlet moment-timezone kleur
-```
+### 1. Fork / Clone repo ke GitHub
 
-## Setup Cookies
+Buat repo public dari project ini.
 
-### GitHub Secrets (Public Repo)
+### 2. Setup Secret `COOKIES_JSON`
 
-Karena repo ini public, cookies **jangan** disimpan di file. Gunakan GitHub Secrets:
+Karena repo public, cookies disimpan sebagai **GitHub Secret**:
 
-1. Export cookies dari browser (EditThisCookie / cookie-export)
-2. Copy JSON array cookies ke clipboard
-3. Di GitHub repo, masuk ke **Settings → Secrets and variables → Actions**
-4. Tambah secret baru: nama `COOKIES_JSON`, isi dengan JSON cookies
+1. Export cookies TikTok dari browser (pakai EditThisCookie / cookie-export extension)
+2. Dapet JSON array, contoh:
+   ```json
+   [{"name":"sessionid","value":"xxx","domain":".tiktok.com"}]
+   ```
+3. Di repo GitHub, buka **Settings → Secrets and variables → Actions**
+4. Klik **New repository secret**
+   - **Name:** `COOKIES_JSON`
+   - **Secret:** paste JSON cookies (compress jadi satu baris)
+5. Save
 
-Script otomatis baca dari `process.env.COOKIES_JSON`.
+### 3. Setup Config (Opsional)
 
-### Local Development
-
-Buat file `.env` di root (jangan di-commit, sudah di `.gitignore`):
-
-```env
-COOKIES_JSON=[{"name":"sessionid","value":"xxx","domain":".tiktok.com"}]
-```
-
-Atau buat `cookies.json` untuk fallback lokal (jangan di-commit).
-
-Urutan prioritas loading:
-1. `COOKIES_JSON` env var (prioritas utama — GitHub Actions / hosting)
-2. `cookies.json` file (fallback lokal, sudah di `.gitignore`)
-
-## Konfigurasi
-
-Buat file `config.json` (opsional, kalau tidak ada pakai default):
+Sesuain `config.json` di root repo sesuai kebutuhan:
 
 ```json
 {
@@ -56,53 +44,50 @@ Buat file `config.json` (opsional, kalau tidak ada pakai default):
 }
 ```
 
-| Key | Deskripsi | Default |
+| Key | Fungsi | Default |
 |---|---|---|
-| `message` | Isi pesan yang dikirim | `"Auto Streak"` |
-| `totalUsers` | Jumlah chat yang diproses | `13` |
-| `actionDelayMs` | Delay antar user (ms) | `300` |
-| `typeDelayMs` | Delay tiap karakter saat mengetik (ms) | `0` |
-| `afterSendDelayMs` | Delay setelah kirim pesan (ms) | `500` |
-| `afterClickDelayMs` | Delay setelah klik editor (ms) | `300` |
-| `pageLoadDelayMs` | Delay tunggu halaman load (ms) | `5000` |
-| `finishDelayMs` | Delay sebelum browser ditutup (ms) | `3000` |
-| `headless` | Jalankan browser tanpa tampilan | `true` |
-| `bannerFont` | Font ASCII banner (figlet) | `"DOS Rebel"` |
-| `targetUrl` | URL halaman pesan TikTok | `https://www.tiktok.com/messages?lang=en` |
+| `message` | Isi pesan | `"Auto Streak"` |
+| `totalUsers` | Jumlah chat diproses | `13` |
+| `actionDelayMs` | Delay antar chat (ms) | `300` |
+| `typeDelayMs` | Delay per karakter (ms) | `0` |
+| `afterSendDelayMs` | Delay setelah kirim (ms) | `500` |
+| `afterClickDelayMs` | Delay setelah klik (ms) | `300` |
+| `pageLoadDelayMs` | Delay tunggu halaman (ms) | `5000` |
+| `finishDelayMs` | Delay sebelum tutup (ms) | `3000` |
+| `headless` | Headless mode | `true` |
+| `bannerFont` | Font figlet banner | `"DOS Rebel"` |
+| `targetUrl` | URL pesan TikTok | `https://www.tiktok.com/messages?lang=en` |
 
 ## Menjalankan
 
-```bash
-node index.js
+### Otomatis (Cron)
+
+Workflow sudah jalan otomatis setiap jam **22:00 & 00:00 WIB** (15:00 & 17:00 UTC):
+
+```yaml
+cron: "0 15 * * *"   # 22:00 WIB
+cron: "0 17 * * *"   # 00:00 WIB
 ```
 
-Dengan opsi tambahan:
+Edit schedule di `.github/workflows/TikTok-Streak.yml` kalo mau diubah.
 
-```bash
-node index.js --debug
-node index.js --message "Halo bro" --count 16 --delay 500
-```
+### Manual (Workflow Dispatch)
 
-| Flag | Fungsi |
-|---|---|
-| `--debug` | Tampilkan log detail tiap langkah |
-| `--message <teks>` | Override isi pesan |
-| `--count <angka>` | Override jumlah chat yang diproses |
-| `--delay <ms>` | Override delay antar user |
+1. Buka repo GitHub
+2. **Actions → TikTok Streak → Run workflow**
+3. Klik **Run workflow**, langsung jalan
+
+Hasil log bisa dilihat realtime di tab Actions.
 
 ## Cara Kerja
 
-1. Browser dibuka dan login otomatis pakai cookies
-2. Membuka halaman pesan TikTok
-3. Untuk setiap chat dalam daftar:
-   - Buka percakapan
-   - Klik kotak teks
-   - Ketik pesan
-   - Kirim dengan `Ctrl+Enter`
-4. Tampilkan ringkasan hasil (berapa sukses/gagal)
+1. GitHub Actions checkout repo + install dependencies
+2. Inject `COOKIES_JSON` dari secrets ke environment
+3. Puppeteer login pake cookies & kirim pesan ke tiap chat
+4. Hasil (sukses/gagal) keluar di log Actions
 
 ## Catatan
 
-- Pastikan `.env` dan `cookies.json` ada di `.gitignore`, jangan ikut ter-commit
-- Session cookies bisa expired, kalau bot gagal login coba ambil cookies baru
-- Selector CSS bisa berubah kalau TikTok update UI, perlu disesuaikan ulang
+- Cookies bisa expired. Kalo mulai gagal login, export ulang cookies dari browser dan update secret `COOKIES_JSON`
+- Selector CSS TikTok bisa berubah kalo mereka update UI — fork aja dan sesuaikan selector di `index.js`
+- Bot jalan di `windows-latest` runner (Chromium bundling stabil)
