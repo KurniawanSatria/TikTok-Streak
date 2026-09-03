@@ -23,7 +23,7 @@ const CONFIG_FILE = path.join(__dirname, "config.json");
 
 const DEFAULT_CONFIG = {
   message: "API",
-  totalUsers: 13,
+  totalUsers: 12,
   actionDelayMs: 300,
   typeDelayMs: 0,
   afterSendDelayMs: 500,
