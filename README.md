@@ -1,5 +1,5 @@
 # TikTok Streak Bot
-<img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/67aef3dc-6cc5-48d8-8d3c-f8a40d999ac2" />
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/67aef3dc-6cc5-48d8-8d3c-f8a40d999ac2" />
 
 
 Otomatis kirim pesan streak ke percakapan TikTok via **GitHub Actions** — jalan di cloud, ga perlu PC nyala.
