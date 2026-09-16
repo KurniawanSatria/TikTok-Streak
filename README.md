@@ -1,8 +1,14 @@
+
+> [!WARNING]
+> **This TikTok Streak Bot is illegal. Use at your own risk.**
+>
+> You've been warned.
 # TikTok Streak Bot
+
 <img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/67aef3dc-6cc5-48d8-8d3c-f8a40d999ac2" />
 
-
 Otomatis kirim pesan streak ke percakapan TikTok via **GitHub Actions** — jalan di cloud, ga perlu PC nyala.
+
 
 ## Fitur
 
@@ -25,7 +31,7 @@ Karena repo public, cookies disimpan sebagai **GitHub Secret**:
 1. Export cookies TikTok dari browser (pakai EditThisCookie / cookie-export extension)
 2. Dapet JSON array, contoh:
    ```json
-   [{"name":"sessionid","value":"xxx","domain":".tiktok.com"}]
+   [{ "name": "sessionid", "value": "xxx", "domain": ".tiktok.com" }]
    ```
 3. Di repo GitHub, buka **Settings → Secrets and variables → Actions**
 4. Klik **New repository secret**
@@ -46,19 +52,19 @@ Sesuain `config.json` di root repo sesuai kebutuhan:
 }
 ```
 
-| Key | Fungsi | Default |
-|---|---|---|
-| `message` | Isi pesan | `"Auto Streak"` |
-| `totalUsers` | Jumlah chat diproses | `13` |
-| `actionDelayMs` | Delay antar chat (ms) | `300` |
-| `typeDelayMs` | Delay per karakter (ms) | `0` |
-| `afterSendDelayMs` | Delay setelah kirim (ms) | `500` |
-| `afterClickDelayMs` | Delay setelah klik (ms) | `300` |
-| `pageLoadDelayMs` | Delay tunggu halaman (ms) | `5000` |
-| `finishDelayMs` | Delay sebelum tutup (ms) | `3000` |
-| `headless` | Headless mode | `true` |
-| `bannerFont` | Font figlet banner | `"DOS Rebel"` |
-| `targetUrl` | URL pesan TikTok | `https://www.tiktok.com/messages?lang=en` |
+| Key                 | Fungsi                    | Default                                   |
+| ------------------- | ------------------------- | ----------------------------------------- |
+| `message`           | Isi pesan                 | `"Auto Streak"`                           |
+| `totalUsers`        | Jumlah chat diproses      | `13`                                      |
+| `actionDelayMs`     | Delay antar chat (ms)     | `300`                                     |
+| `typeDelayMs`       | Delay per karakter (ms)   | `0`                                       |
+| `afterSendDelayMs`  | Delay setelah kirim (ms)  | `500`                                     |
+| `afterClickDelayMs` | Delay setelah klik (ms)   | `300`                                     |
+| `pageLoadDelayMs`   | Delay tunggu halaman (ms) | `5000`                                    |
+| `finishDelayMs`     | Delay sebelum tutup (ms)  | `3000`                                    |
+| `headless`          | Headless mode             | `true`                                    |
+| `bannerFont`        | Font figlet banner        | `"DOS Rebel"`                             |
+| `targetUrl`         | URL pesan TikTok          | `https://www.tiktok.com/messages?lang=en` |
 
 ## Menjalankan
 
@@ -67,8 +73,8 @@ Sesuain `config.json` di root repo sesuai kebutuhan:
 Workflow sudah jalan otomatis setiap jam **22:00 & 00:00 WIB** (15:00 & 17:00 UTC):
 
 ```yaml
-cron: "0 15 * * *"   # 22:00 WIB
-cron: "0 17 * * *"   # 00:00 WIB
+cron: "0 15 * * *" # 22:00 WIB
+cron: "0 17 * * *" # 00:00 WIB
 ```
 
 Edit schedule di `.github/workflows/TikTok-Streak.yml` kalo mau diubah.
