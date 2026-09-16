@@ -1,5 +1,6 @@
 {
   "message": "API",
+  "useQuotesAPi": true,
   "totalUsers": 14,
   "actionDelayMs": 300,
   "typeDelayMs": 0,
@@ -7,7 +8,7 @@
   "afterClickDelayMs": 300,
   "pageLoadDelayMs": 5000,
   "finishDelayMs": 3000,
-  "headless": true,
+  "headless": false,
   "bannerFont": "DOS Rebel",
   "targetUrl": "https://www.tiktok.com/messages?lang=en"
 }
