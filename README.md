@@ -1,48 +1,66 @@
-> [!WARNING]
-> **This TikTok Streak Bot is illegal. Use it at your own risk.**
->
-> This project is provided for educational and experimental purposes only. By using this bot, you acknowledge that you are responsible for your own actions and any consequences that may result from its use.
->
-> **You have been warned.**
-
 # TikTok Streak Bot
 
 <img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/67aef3dc-6cc5-48d8-8d3c-f8a40d999ac2" />
 
-An automated TikTok streak bot that sends messages to TikTok conversations using **GitHub Actions**.
+- Bot otomatis streak TikTok: kirim pesan ke banyak percakapan via Puppeteer
+- Dijalankan sepenuhnya di GitHub Actions, tidak perlu PC nyala
+- Konfigurasi via `config.json`, cookie via GitHub Secrets, notifikasi Discord
 
-It runs entirely in the cloud, so you don't need to keep your PC running.
+> [!WARNING]
+> **This TikTok Streak Bot is illegal. Use it at your own risk.**
+>
+> This project is provided for educational and experimental purposes only. By using this bot, you acknowledge that you are responsible for your own actions and any consequences that may result from its use.
 
 ## Features
 
-* 🔐 Login using TikTok session cookies
-* 💬 Automatically send messages to multiple conversations
-* ⚙️ Configurable through `config.json`
-* ⏰ Automatically runs on a cron schedule
-* ▶️ Can be triggered manually at any time
-* ☁️ Runs on GitHub Actions without requiring a local machine
+- Login pakai session cookie TikTok (env `COOKIES_JSON` atau `cookies.json` lokal)
+- Kirim pesan otomatis ke N percakapan dengan jeda configurable
+- Mode pesan statis atau kutipan acak dari `dummyjson.com/quotes/random`
+- Cron otomatis dua kali sehari di GitHub Actions + `workflow_dispatch` manual
+- Notifikasi status run ke Discord webhook
+
+## Structure of the Repo
+
+| Path | Description |
+| :--- | :--- |
+| `.github/` | Workflow Actions, CodeQL, Dependabot |
+| `config.json` | Semua opsi perilaku bot (pesan, delay, dsb) |
+| `index.js` | Bot Puppeteer: launch, inject cookie, kirim pesan |
+| `package.json` | Manifest npm: dependency Puppeteer, figlet, kleur |
+
+## Description of Files
+
+| File | Description | Cluster |
+| :--- | :--- | :--- |
+| `.gitignore` | Abaikan `node_modules/`, `cookies.json`, `.env` | Config |
+| `.github/codeql.yml` | CodeQL: analisis keamanan mingguan, per push | Security |
+| `.github/dependabot.yml` | Dependabot: update npm + Actions | Maintenance |
+| `.github/workflows/...` | Cron 22:00/00:00 WIB, run bot, notif | Automation |
+| `config.json` | Opsi bot: pesan, jumlah user, semua delay, headless | Config |
+| `index.js` | Automasi UI TikTok messages: iframe, editor, Ctrl+Enter | Bot Logic |
+| `package-lock.json` | Lockfile dependency npm | Config |
+| `package.json` | Manifest npm dan scripts | Config |
+| `README.md` | Dokumentasi ini | Docs |
 
 ## Setup
 
-### 1. Fork or Clone the Repository
+### 1. Fork or clone
 
-Fork this repository to your GitHub account, or clone it locally and push it to your own repository.
+Fork repo ini ke akun GitHub kamu, atau clone lokal lalu push ke repo sendiri.
 
-> **Note:** A public repository is supported because sensitive TikTok cookies are stored securely as GitHub Actions Secrets.
+> **Note:** Public repository aman dipakai karena cookie sensitif disimpan di
+> GitHub Actions Secrets, bukan di kode.
 
 ### 2. Configure `COOKIES_JSON`
 
-The bot requires TikTok session cookies to authenticate.
+Bot autentikasi pakai session cookie TikTok.
 
-**Never put your cookies directly inside the source code or commit them to the repository.**
+- **Never** taruh cookie langsung di source code atau commit ke repo
+- Simpan sebagai GitHub Actions Secret
 
-Instead, store them as a GitHub Actions Secret.
+#### Export cookies
 
-#### Export your TikTok cookies
-
-Use a browser cookie-export extension such as EditThisCookie or another compatible cookie exporter.
-
-The exported data should look similar to:
+Pakai extension export cookie seperti EditThisCookie. Format yang diharapkan:
 
 ```json
 [
@@ -54,153 +72,152 @@ The exported data should look similar to:
 ]
 ```
 
-#### Add the cookies to GitHub Secrets
+#### Add the secret
 
-1. Open your GitHub repository.
-2. Go to **Settings → Secrets and variables → Actions**.
-3. Click **New repository secret**.
-4. Set the following:
+1. Buka repo kamu di GitHub
+2. Masuk **Settings > Secrets and variables > Actions**
+3. Klik **New repository secret**
+4. Isi:
+   - **Name:** `COOKIES_JSON`
+   - **Secret:** hasil export cookie (boleh di-compress jadi satu baris)
+5. Save
 
-   * **Name:** `COOKIES_JSON`
-   * **Secret:** Your exported TikTok cookies in JSON format.
-5. Save the secret.
-
-For convenience, the JSON can be compressed into a single line before being pasted.
+Opsional: set secret `DISCORD_WEBHOOK` untuk notifikasi status run.
 
 > [!CAUTION]
 > **Treat your TikTok cookies like a password.**
 >
-> Anyone who obtains valid session cookies may potentially access your TikTok session. Never publish them, commit them to Git, or share them with anyone.
+> Anyone who obtains valid session cookies may potentially access your TikTok
+> session. Never publish them, commit them to Git, or share them with anyone.
 
-### 3. Configure the Bot
-
-Edit `config.json` in the root directory according to your needs.
-
-Example:
+### 3. Configure `config.json`
 
 ```json
 {
-  "message": "Auto Streak",
-  "totalUsers": 13,
+  "message": "API",
+  "useQuotesAPi": true,
+  "totalUsers": 14,
   "actionDelayMs": 300,
-  "headless": true
+  "typeDelayMs": 0,
+  "afterSendDelayMs": 500,
+  "afterClickDelayMs": 300,
+  "pageLoadDelayMs": 5000,
+  "finishDelayMs": 3000,
+  "headless": false,
+  "bannerFont": "DOS Rebel",
+  "targetUrl": "https://www.tiktok.com/messages?lang=en"
 }
 ```
 
-### Configuration Options
+| Key | Description | Repo |
+| :-- | :-- | :-- |
+| `message` | Pesan yang dikirim ke tiap percakapan | `"API"` |
+| `useQuotesAPi` | `true` mengganti pesan jadi kutipan acak dummyjson | `true` |
+| `totalUsers` | Jumlah percakapan yang diproses | `14` |
+| `actionDelayMs` | Jeda antar percakapan (ms) | `300` |
+| `typeDelayMs` | Jeda per karakter saat mengetik (ms) | `0` |
+| `afterSendDelayMs` | Jeda setelah mengetik dan setelah kirim (ms) | `500` |
+| `afterClickDelayMs` | Jeda setelah klik elemen (ms) | `300` |
+| `pageLoadDelayMs` | Tunggu halaman siap (ms) | `5000` |
+| `finishDelayMs` | Jeda sebelum browser ditutup (ms) | `3000` |
+| `headless` | Jalankan Chromium headless | `false` |
+| `bannerFont` | Font banner figlet | `"DOS Rebel"` |
+| `targetUrl` | URL messaging TikTok | TikTok messages |
 
-| Key                 | Description                                              | Default                                   |
-| ------------------- | -------------------------------------------------------- | ----------------------------------------- |
-| `message`           | Message sent to each conversation                        | `"Auto Streak"`                           |
-| `totalUsers`        | Number of conversations to process                       | `13`                                      |
-| `actionDelayMs`     | Delay between conversations in milliseconds              | `300`                                     |
-| `typeDelayMs`       | Delay between each typed character in milliseconds       | `0`                                       |
-| `afterSendDelayMs`  | Delay after sending a message in milliseconds            | `500`                                     |
-| `afterClickDelayMs` | Delay after clicking an element in milliseconds          | `300`                                     |
-| `pageLoadDelayMs`   | Delay while waiting for the page to load in milliseconds | `5000`                                    |
-| `finishDelayMs`     | Delay before closing the browser in milliseconds         | `3000`                                    |
-| `headless`          | Run Chromium in headless mode                            | `true`                                    |
-| `bannerFont`        | Figlet banner font                                       | `"DOS Rebel"`                             |
-| `targetUrl`         | TikTok messaging URL                                     | `https://www.tiktok.com/messages?lang=en` |
+## Running
 
-## Running the Bot
+### Via GitHub Actions (disarankan)
 
-### Automatic Schedule
+- Otomatis sesuai cron di `.github/workflows/TikTok-Streak.yml`:
+  - `15:00 UTC` = 22:00 WIB
+  - `17:00 UTC` = 00:00 WIB
+- Manual via **Actions > TikTok Streak > Run workflow**
 
-The GitHub Actions workflow is configured to run automatically at:
+## `index.js` (run lokal)
 
-* **22:00 WIB** → `15:00 UTC`
-* **00:00 WIB** → `17:00 UTC`
+- Launch Chromium via Puppeteer, inject cookies dari env atau file
+- Buka halaman messaging, dismiss modal awal, loop kirim pesan
+- Kirim dengan `Ctrl+Enter`, log sukses/gagal per user, summary di akhir
 
-Example:
+- Jalankan normal:
+  ```bash
+  > npm install
+  > node index.js
+  ```
 
-```yaml
-cron: "0 15 * * *" # 22:00 WIB
-cron: "0 17 * * *" # 00:00 WIB
-```
+- Jalankan dengan log detail per langkah:
+  ```bash
+  > node index.js --debug
+  ```
 
-To change the schedule, edit:
+- Jalankan dengan cookie lokal tanpa env:
+  ```bash
+  > COOKIES_JSON="$(cat cookies.json)" node index.js
+  ```
 
-```text
-.github/workflows/TikTok-Streak.yml
-```
-
-### Manual Workflow Dispatch
-
-You can also run the bot manually whenever you want.
-
-1. Open your GitHub repository.
-2. Go to **Actions**.
-3. Select **TikTok Streak**.
-4. Click **Run workflow**.
-5. Click **Run workflow** again to start the job.
-
-The workflow output can be monitored in real time from the **Actions** tab.
+> **Note:** Mode lokal memakai `cookies.json` (sudah di-gitignore) jika env
+> `COOKIES_JSON` tidak diset. Keduanya menerima array cookie (normal), atau
+> satu objek cookie tunggal yang dibungkus otomatis.
 
 ## How It Works
 
-The bot runs through the following process:
+Flow GitHub Actions:
 
-1. GitHub Actions checks out the repository.
-2. Required dependencies are installed.
-3. The `COOKIES_JSON` secret is injected into the workflow environment.
-4. Puppeteer launches Chromium.
-5. TikTok session cookies are loaded into the browser.
-6. The bot opens the TikTok messaging page.
-7. Messages are sent to the configured conversations.
-8. Success and failure information is displayed in the GitHub Actions logs.
-9. The browser closes after the workflow finishes.
+1. Checkout repo + setup Node 20 di runner `windows-latest`
+2. `npm install` dependencies
+3. Inject secret `COOKIES_JSON` ke env
+4. Jalankan `node index.js`:
+   - Puppeteer launch Chromium (`--no-sandbox`)
+   - Set cookie ke page, buka `targetUrl`, tunggu `pageLoadDelayMs`
+   - Cari iframe messages, tutup modal `_TUXModal-wrapper` kalau muncul
+   - Loop `totalUsers`: klik conversation, klik editor, ketik pesan,
+     kirim `Ctrl+Enter`
+   - Log `[i/N] username`, summary `Success/Failed`
+5. Kirim notifikasi Discord (`if: always()`)
+
+## Configuration Reference (bot)
+
+- Sumber delay: `config.json` saja, tidak ada hardcoded schedule di `index.js`
+- Error per user ditangkap try/catch individu, satu gagal tidak menghentikan run
 
 ## Troubleshooting
 
-### Cookies Expired
+### Cookies expired
 
-TikTok session cookies may expire.
+- Export ulang cookie dari browser
+- Replace secret `COOKIES_JSON`
+- Run ulang workflow
 
-If the bot can no longer authenticate:
+### TikTok UI changed
 
-1. Export fresh cookies from your browser.
-2. Replace the existing `COOKIES_JSON` GitHub Secret.
-3. Run the workflow again.
+- Selector di `index.js` perlu diupdate
+- Yang mungkin berubah: selector iframe messages, `data-e2e` conversation item,
+  selector editor `public-DraftEditor-content`
+- Cek dengan `node index.js --debug` untuk lihat langkah gagal
 
-### TikTok UI Changes
+### Workflow fails
 
-TikTok may change its website structure or UI over time.
+- Cek log di **GitHub > Actions > TikTok Streak**
+- Log menunjukkan step mana yang gagal
 
-If the bot stops finding elements, the CSS selectors used by the bot may need to be updated.
+### Headless diblokir TikTok
 
-Check:
-
-```text
-index.js
-```
-
-and update the affected selectors accordingly.
-
-### Workflow Fails
-
-Check the workflow logs under:
-
-**GitHub → Actions → TikTok Streak**
-
-The logs should indicate which step failed.
+- Coba set `"headless": false`
+- Atau naikkan `pageLoadDelayMs` dan `actionDelayMs`
 
 ## Runner
-
-The workflow currently uses:
 
 ```yaml
 runs-on: windows-latest
 ```
 
-The Windows runner is used to provide a stable environment for the bundled Chromium/Puppeteer setup.
+- Windows runner dipakai untuk environment Chromium/Puppeteer yang stabil
+- Node 20 via `actions/setup-node@v4`
 
 ## Disclaimer
 
-This project is **not affiliated with, endorsed by, or sponsored by TikTok**.
-
-The repository owner provides this project as-is and does not take responsibility for how it is used.
-
-Users are responsible for understanding and accepting any risks, restrictions, consequences, or rules that may apply to their use of the bot.
+- Project ini **tidak berafiliasi dengan, diendorse, atau disponsori TikTok**
+- Owner repo menyediakan project as-is tanpa menanggung risiko penggunaan
+- Kamu bertanggung jawab atas risiko, batasan, dan konsekuensi pemakaian bot
 
 > **Use responsibly. You've been warned.**
