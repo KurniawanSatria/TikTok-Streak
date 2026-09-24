@@ -124,16 +124,12 @@ Opsional: set secret `DISCORD_WEBHOOK` untuk notifikasi status run.
 | `bannerFont` | Font banner figlet | `"DOS Rebel"` |
 | `targetUrl` | URL messaging TikTok | TikTok messages |
 
-## Running
+## Description of Executables
 
-### Via GitHub Actions (disarankan)
+- Tidak ada file executable; satu-satunya tool adalah `index.js`, dijalankan
+  lewat `node` atau GitHub Actions
 
-- Otomatis sesuai cron di `.github/workflows/TikTok-Streak.yml`:
-  - `15:00 UTC` = 22:00 WIB
-  - `17:00 UTC` = 00:00 WIB
-- Manual via **Actions > TikTok Streak > Run workflow**
-
-## `index.js` (run lokal)
+### `index.js`
 
 - Launch Chromium via Puppeteer, inject cookies dari env atau file
 - Buka halaman messaging, dismiss modal awal, loop kirim pesan
@@ -159,26 +155,51 @@ Opsional: set secret `DISCORD_WEBHOOK` untuk notifikasi status run.
 > `COOKIES_JSON` tidak diset. Keduanya menerima array cookie (normal), atau
 > satu objek cookie tunggal yang dibungkus otomatis.
 
-## How It Works
+## Description of Workflows
 
-Flow GitHub Actions:
+### Via GitHub Actions (disarankan)
 
-1. Checkout repo + setup Node 20 di runner `windows-latest`
-2. `npm install` dependencies
-3. Inject secret `COOKIES_JSON` ke env
-4. Jalankan `node index.js`:
-   - Puppeteer launch Chromium (`--no-sandbox`)
-   - Set cookie ke page, buka `targetUrl`, tunggu `pageLoadDelayMs`
-   - Cari iframe messages, tutup modal `_TUXModal-wrapper` kalau muncul
-   - Loop `totalUsers`: klik conversation, klik editor, ketik pesan,
-     kirim `Ctrl+Enter`
-   - Log `[i/N] username`, summary `Success/Failed`
-5. Kirim notifikasi Discord (`if: always()`)
+- Trigger: cron dua kali sehari di `.github/workflows/TikTok-Streak.yml`:
+  - `15:00 UTC` = 22:00 WIB
+  - `17:00 UTC` = 00:00 WIB
+- Manual kapan saja: **Actions > TikTok Streak > Run workflow**
+- Notifikasi Discord terkirim setiap run selesai, sukses atau gagal
 
-## Configuration Reference (bot)
+### Run lokal
 
-- Sumber delay: `config.json` saja, tidak ada hardcoded schedule di `index.js`
-- Error per user ditangkap try/catch individu, satu gagal tidak menghentikan run
+- Utamakan untuk debug; langkah ada di `Description of Executables`
+- Bila headless diblokir TikTok, lihat `Troubleshooting`
+
+## Description of Architecture
+
+- Alur satu run bot, satu arah dari trigger ke notifikasi:
+
+```mermaid
+flowchart LR
+  A[Trigger: cron atau workflow_dispatch] --> B[Actions runner: windows-latest]
+  B --> C[npm install dependencies]
+  C --> D[node index.js: load cookies]
+  D --> E[Puppeteer: launch Chromium no-sandbox]
+  E --> F[Set cookie, buka targetUrl]
+  F --> G[iframe messages, dismiss modal]
+  G --> H[Loop totalUsers: klik, ketik, Ctrl+Enter]
+  H --> I[Summary Success/Failed]
+  I --> J[Discord webhook: status run]
+```
+
+- Modul `index.js`:
+  - Config: `loadConfig()` membaca `config.json`, error jika invalid
+  - Credentials: env `COOKIES_JSON` dulu, lalu file `cookies.json` lokal;
+    array cookie atau objek tunggal dibungkus otomatis
+  - Navigation: viewport 1280x800, `networkidle2`, tunggu `pageLoadDelayMs`
+  - Modal: klik di luar `_TUXModal-wrapper` bila muncul dalam 3 detik
+  - Loop: selector `div[data-index="i"]` per percakapan; error per user
+    ditangkap try/catch individu, satu gagal tidak menghentikan run
+  - Message: statis dari `config.message` atau kutipan acak `fetchQuote()`
+- Workflow Actions `.github/workflows/TikTok-Streak.yml`:
+  - `runs-on: windows-latest`, Node 20 via `actions/setup-node@v4`
+  - Secret `COOKIES_JSON` di-inject ke env step run
+  - Discord notification via `tsickert/discord-webhook@v7.0.0`, `if: always()`
 
 ## Troubleshooting
 
@@ -204,15 +225,6 @@ Flow GitHub Actions:
 
 - Coba set `"headless": false`
 - Atau naikkan `pageLoadDelayMs` dan `actionDelayMs`
-
-## Runner
-
-```yaml
-runs-on: windows-latest
-```
-
-- Windows runner dipakai untuk environment Chromium/Puppeteer yang stabil
-- Node 20 via `actions/setup-node@v4`
 
 ## Disclaimer
 
