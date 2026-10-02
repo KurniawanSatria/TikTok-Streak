@@ -13,6 +13,14 @@ const isDebug = args.includes("--debug");
 const CREDENTIALS_FILE = path.join(__dirname, "cookies.json");
 const CONFIG_FILE = path.join(__dirname, "config.json");
 const loadConfig = () => {
+  const fromEnv = process.env.CONFIG_JSON;
+  if (fromEnv) {
+    try {
+      return JSON.parse(fromEnv);
+    } catch {
+      throw new Error("Invalid CONFIG_JSON environment variable");
+    }
+  }
   if (!fs.existsSync(CONFIG_FILE))
     throw new Error("config.json tidak ditemukan");
   try {
@@ -22,7 +30,16 @@ const loadConfig = () => {
   }
 };
 const CONFIG = loadConfig();
-const BROWSER_CONFIG = { args: ["--no-sandbox", "--disable-setuid-sandbox"], headless: CONFIG.headless };
+if (process.env.HEADLESS !== undefined) CONFIG.headless = process.env.HEADLESS === "true";
+if (process.env.TOTAL_USERS !== undefined) CONFIG.totalUsers = Number(process.env.TOTAL_USERS);
+if (process.env.MESSAGE !== undefined) CONFIG.message = process.env.MESSAGE;
+const BROWSER_CONFIG = {
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  headless: CONFIG.headless,
+};
+if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+  BROWSER_CONFIG.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+}
 const fetchQuote = async () => {
   try {
     const res = await fetch("https://dummyjson.com/quotes/random");

@@ -42,6 +42,24 @@
 | `package.json` | Manifest npm dan scripts | Config |
 | `README.md` | Dokumentasi ini | Docs |
 
+## Docker
+
+```bash
+docker build -t tiktok-streak .
+docker run --rm \
+  -e COOKIES_JSON="$(cat cookies.json)" \
+  -e HEADLESS=true \
+  tiktok-streak
+```
+
+Config can be overridden via environment variables: `CONFIG_JSON` (full JSON), `HEADLESS`, `TOTAL_USERS`, `MESSAGE`, `COOKIES_JSON`.
+
+For a schedule, run the container on a cron job, e.g.:
+
+```cron
+0 9,17 * * * docker run --rm -e COOKIES_JSON='[...]' tiktok-streak
+```
+
 ## Setup
 
 ### 1. Fork or clone
