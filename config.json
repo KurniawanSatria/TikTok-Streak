@@ -10,5 +10,5 @@
   "finishDelayMs": 3000,
   "headless": false,
   "bannerFont": "DOS Rebel",
-  "targetUrl": "https://www.tiktok.com/messages?lang=en"
+  "targetUrl": "https://www.tiktok.com/business-suite/messages?lang=en&from=homepage"
 }
